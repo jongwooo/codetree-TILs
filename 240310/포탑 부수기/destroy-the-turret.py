@@ -24,8 +24,7 @@ def find_target():
 
 def find_lazer_path():
     global attacker, target
-    lazer_path = []
-    queue = deque([(attacker[0], attacker[1], lazer_path)])
+    queue = deque([(attacker[0], attacker[1], [])])
     visited = [[False] * M for _ in range(N)]
     visited[attacker[0]][attacker[1]] = True
     while queue:
@@ -36,8 +35,8 @@ def find_lazer_path():
             nx = (x + dx) % N
             ny = (y + dy) % M
             if turrets[nx][ny] != 0 and not visited[nx][ny]:
-                lazer_path += [(nx, ny)]
-                queue.append((nx, ny, lazer_path))
+                new_path = lazer_path + [(nx, ny)]
+                queue.append((nx, ny, new_path))
                 visited[nx][ny] = True
     return False, lazer_path
 
@@ -92,7 +91,6 @@ for turn in range(K):
     attacker = find_attacker()
     attack_history[attacker[0]][attacker[1]] = turn + 1
     turrets[attacker[0]][attacker[1]] += N + M
-
     target = find_target()
 
     success, path = find_lazer_path()
