@@ -23,7 +23,7 @@ def bfs(sx, sy, team_num):
             nx = x + dx
             ny = y + dy
             if 0 <= nx < n and 0 <= ny < n and not visited[nx][ny]:
-                if grid[nx][ny] == 2 or ((sx, sy) != (nx, ny) and grid[nx][ny] == 3):  # 몸통 또는 꼬리인 경우
+                if grid[nx][ny] == 2 or ((sx, sy) != (x, y) and grid[nx][ny] == 3):  # 몸통 또는 꼬리인 경우
                     queue.append((nx, ny))
                     team.append((nx, ny))
                     visited[nx][ny] = 1
@@ -46,7 +46,7 @@ def head_move():
                 break
 
 
-def throw_ball(r):
+def catch_ball(r):
     global score
     d = (r // n) % 4
     offset = r % n
@@ -79,5 +79,5 @@ initialize_teams()
 score = 0
 for r in range(k):
     head_move()
-    throw_ball(r)
+    catch_ball(r)
 print(score)
