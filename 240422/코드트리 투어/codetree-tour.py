@@ -1,72 +1,74 @@
 import sys
 import heapq
 
-INF = int(1e9)
-starting_point = 0
-graph = []
-distance = []
-products = dict()
-
 
 def init(n, m, vertex_info):
-    global starting_point, graph, distance, products
-    starting_point = 0
+    global graph, cost, product, for_sale, cancel, starting_point, size
     graph = [[] for _ in range(n)]
-    distance = [INF] * n
     for v, u, w in vertex_info:
         graph[v].append((u, w))
         graph[u].append((v, w))
-    products = dict()
-    dijkstra()
+    starting_point = 0
+    size = n
+    cost = dijkstra()
+    product = []
+    for_sale = [False] * 30_005
+    cancel = [False] * 30_005
 
 
 def add_product(idx, revenue, dest):
-    global products
-    products[idx] = (revenue, dest)
+    global for_sale
+    for_sale[idx] = True
+    heapq.heappush(product, ((revenue - cost[dest]) * -1, idx, revenue, dest))
 
 
 def cancel_product(idx):
-    global products
-    if idx in products:
-        del products[idx]
+    global cancel
+    if for_sale[idx]:
+        cancel[idx] = True
 
 
 def sell_optimal_product():
-    product_candidates = []
-    for idx, product in products.items():
-        revenue, dest = product
-        cost = distance[dest]
-        if cost == INF:
-            continue
-        if revenue < cost:
-            continue
-        heapq.heappush(product_candidates, (-(revenue - cost), idx))
-    if not product_candidates:
-        return -1
-    _, optimal_idx = heapq.heappop(product_candidates)
-    cancel_product(optimal_idx)
-    return optimal_idx
+    while product:
+        p = product[0]
+        if p[0] > 0:
+            break
+        heapq.heappop(product)
+        if not cancel[p[1]]:
+            return p[1]
+    return -1
 
 
-def move_starting_point(s):
-    global starting_point
-    starting_point = s
-    dijkstra()
+def move_starting_point(point):
+    global starting_point, cost, product
+    starting_point = point
+    cost = dijkstra()
+    product = renew()
+
+
+def renew():
+    renewed = []
+    while product:
+        _, idx, revenue, dest = heapq.heappop(product)
+        heapq.heappush(renewed, ((revenue - cost[dest]) * -1, idx, revenue, dest))
+    return renewed
 
 
 def dijkstra():
     queue = []
-    heapq.heappush(queue, (0, starting_point))
+    distance = [INF] * size
     distance[starting_point] = 0
+    heapq.heappush(queue, (0, starting_point))
     while queue:
-        cost, now = heapq.heappop(queue)
-        if distance[now] < cost:
+        dist, now = heapq.heappop(queue)
+        if distance[now] < dist:
             continue
-        for next_node, next_cost in graph[now]:
-            new_cost = cost + next_cost
-            if new_cost < distance[next_node]:
-                distance[next_node] = new_cost
-                heapq.heappush(queue, (new_cost, next_node))
+        for next_node, next_dist in graph[now]:
+            new_dist = dist + next_dist
+            if new_dist < distance[next_node]:
+                distance[next_node] = new_dist
+                heapq.heappush(queue, (new_dist, next_node))
+    return distance
 
 
 INIT = 100
@@ -74,8 +76,16 @@ ADD_PRODUCT = 200
 CANCEL_PRODUCT = 300
 SELL_OPTIMAL_PRODUCT = 400
 MOVE_STARTING_POINT = 500
+INF = int(1e9)
 
 Q = int(sys.stdin.readline())
+graph = []
+cost = []
+product = []
+for_sale = []
+cancel = []
+starting_point = 0
+size = 0
 for _ in range(Q):
     command = list(map(int, sys.stdin.readline().split()))
     if command[0] == INIT:
