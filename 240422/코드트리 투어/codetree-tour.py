@@ -57,21 +57,26 @@ def move_starting_point(s):
     starting_point = s
 
 
+INIT = 100
+ADD_PRODUCT = 200
+CANCEL_PRODUCT = 300
+SELL_OPTIMAL_PRODUCT = 400
+MOVE_STARTING_POINT = 500
+
 Q = int(sys.stdin.readline())
 for _ in range(Q):
-    command = sys.stdin.readline().rstrip().split()
-    if command[0] == '100':
+    command = list(map(int, sys.stdin.readline().split()))
+    if command[0] == INIT:
         v_info = []
         for i in range(3, len(command), 3):
-            v, u, w = map(int, command[i:i + 3])
-            v_info.append((v, u, w))
-        init(int(command[1]), int(command[2]), v_info)
-    elif command[0] == '200':
-        add_product(int(command[1]), int(command[2]), int(command[3]))
-    elif command[0] == '300':
-        cancel_product(int(command[1]))
-    elif command[0] == '400':
+            v_info.append((command[i], command[i + 1], command[i + 2]))
+        init(command[1], command[2], v_info)
+    elif command[0] == ADD_PRODUCT:
+        add_product(command[1], command[2], command[3])
+    elif command[0] == CANCEL_PRODUCT:
+        cancel_product(command[1])
+    elif command[0] == SELL_OPTIMAL_PRODUCT:
         product_id = sell_optimal_product()
         print(product_id)
-    elif command[0] == '500':
-        move_starting_point(int(command[1]))
+    elif command[0] == MOVE_STARTING_POINT:
+        move_starting_point(command[1])
