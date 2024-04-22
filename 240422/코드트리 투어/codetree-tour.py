@@ -4,24 +4,20 @@ import heapq
 INF = int(1e9)
 starting_point = 0
 graph = []
+distance = []
 products = dict()
 
 
 def init(n, m, vertex_info):
-    global graph, products
-    graph = [[INF] * n for _ in range(n)]
-    for i in range(n):
-        graph[i][i] = 0
+    global starting_point, graph, distance, products
+    starting_point = 0
+    graph = [[] for _ in range(n)]
+    distance = [INF] * n
     for v, u, w in vertex_info:
-        if graph[v][u] > w:
-            graph[v][u] = w
-            graph[u][v] = w
-    for k in range(n):
-        for a in range(n):
-            for b in range(n):
-                if graph[a][b] > graph[a][k] + graph[k][b]:
-                    graph[a][b] = graph[a][k] + graph[k][b]
+        graph[v].append((u, w))
+        graph[u].append((v, w))
     products = dict()
+    dijkstra()
 
 
 def add_product(idx, revenue, dest):
@@ -39,7 +35,7 @@ def sell_optimal_product():
     product_candidates = []
     for idx, product in products.items():
         revenue, dest = product
-        cost = graph[starting_point][dest]
+        cost = distance[dest]
         if cost == INF:
             continue
         if revenue < cost:
@@ -55,6 +51,22 @@ def sell_optimal_product():
 def move_starting_point(s):
     global starting_point
     starting_point = s
+    dijkstra()
+
+
+def dijkstra():
+    queue = []
+    heapq.heappush(queue, (0, starting_point))
+    distance[starting_point] = 0
+    while queue:
+        cost, now = heapq.heappop(queue)
+        if distance[now] < cost:
+            continue
+        for next_node, next_cost in graph[now]:
+            new_cost = cost + next_cost
+            if new_cost < distance[next_node]:
+                distance[next_node] = new_cost
+                heapq.heappush(queue, (new_cost, next_node))
 
 
 INIT = 100
