@@ -32,7 +32,7 @@ def find_max_value_coordinate():
                     for y in range(5):
                         if not visited[x][y]:
                             cur_value += bfs1(x, y, visited)
-                heapq.heappush(candidates, (-cur_value, d, sx, sy))
+                heapq.heappush(candidates, (-cur_value, d, sy, sx))
     return heapq.heappop(candidates)
 
 
@@ -78,15 +78,14 @@ def bfs2(x, y, visited):
     number = grid[x][y]
     same_numbers = deque([(x, y)])
     while queue:
-        while queue:
-            x, y = queue.popleft()
-            for dx, dy in dirs:
-                nx = x + dx
-                ny = y + dy
-                if 0 <= nx < 5 and 0 <= ny < 5 and not visited[nx][ny] and grid[nx][ny] == number:
-                    queue.append((nx, ny))
-                    same_numbers.append((nx, ny))
-                    visited[nx][ny] = True
+        x, y = queue.popleft()
+        for dx, dy in dirs:
+            nx = x + dx
+            ny = y + dy
+            if 0 <= nx < 5 and 0 <= ny < 5 and not visited[nx][ny] and grid[nx][ny] == number:
+                queue.append((nx, ny))
+                same_numbers.append((nx, ny))
+                visited[nx][ny] = True
     if len(same_numbers) < 3:
         return 0
     cnt = 0
@@ -110,12 +109,11 @@ grid = [list(map(int, sys.stdin.readline().split())) for _ in range(5)]
 next_items = deque(list(map(int, sys.stdin.readline().split())))
 dirs = ((-1, 0), (0, 1), (0, -1), (1, 0))
 for _ in range(K):
-    value, d, sx, sy = find_max_value_coordinate()
+    value, d, sy, sx = find_max_value_coordinate()
     if value == 0:
         break
     update_grid(d, sx, sy)
     cur_value = remove_used_items()
-    fill_next_items_to_empty_space()
     item_values_sum = 0
     while cur_value > 0:
         item_values_sum += cur_value
