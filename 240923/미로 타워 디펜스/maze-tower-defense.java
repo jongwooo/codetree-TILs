@@ -10,7 +10,6 @@ import java.util.StringTokenizer;
 public class Main {
 
 	static BufferedReader br;
-	static StringBuilder sb;
 	static StringTokenizer st;
 
 	static final int[][] attackDirs = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } }; // → ↓ ← ↑
@@ -24,7 +23,6 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		br = new BufferedReader(new InputStreamReader(System.in));
-		sb = new StringBuilder();
 		st = new StringTokenizer(br.readLine());
 		n = Integer.parseInt(st.nextToken());
 		m = Integer.parseInt(st.nextToken());
