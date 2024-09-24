@@ -63,6 +63,7 @@ public class Main {
 				grid[cx][cy + i] = num;
 			}
 			num++;
+			d = (d + 4) % 4;
 			exitSet.add(new Pos(cx + exitDirs[d][0], cy + exitDirs[d][1]));
 			rowSum += bfs(cx, cy);
 		}
