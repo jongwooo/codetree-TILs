@@ -15,6 +15,8 @@ def find_and_eliminate_max_size_boom_bundle():
                 red_cnt, bundle = bfs(x, y, visited)
                 if len(bundle) > 1:
                     rx, ry = find_reference_point(bundle)
+                    if (rx, ry) == (-1, -1):
+                        continue
                     candidates.append((-len(bundle), red_cnt, -rx, ry, bundle))
     if not candidates:
         return False
@@ -28,10 +30,12 @@ def find_and_eliminate_max_size_boom_bundle():
 
 def find_reference_point(bundle):
     bundle.sort(key=lambda k: (-k[0], k[1]))
+    rx, ry = -1, -1
     for x, y in bundle:
-        if grid[x][y] == RED_BOOM:
-            continue
-        return x, y
+        if grid[x][y] != RED_BOOM:
+            rx, ry = x, y
+            break
+    return rx, ry
 
 
 def bfs(sx, sy, visited):
