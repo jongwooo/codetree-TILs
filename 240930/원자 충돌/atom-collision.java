@@ -100,8 +100,11 @@ public class Main {
 					final int synthesisM = mSum / 5;
 					final int synthesisS = sSum / atomCount;
 					int synthesisD = 0;
+					if (synthesisM == 0) {
+						continue;
+					}
 					if (udlr != 0 && diagonal != 0) {
-						diagonal = 1;
+						synthesisD = 1;
 					}
 					for (int i = 0; i < 4; i++) {
 						temp[x][y].add(new Atom(synthesisM, synthesisS, synthesisD));
