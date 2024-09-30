@@ -38,6 +38,8 @@ def atoms_synthesis():
                 for _ in range(4):
                     temp[x][y].append((synthesis_m, synthesis_s, synthesis_d))
                     synthesis_d += 2
+            else:
+                temp[x][y] = grid[x][y]
     grid = temp
 
 
