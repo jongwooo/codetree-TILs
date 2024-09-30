@@ -63,8 +63,8 @@ public class Main {
 			for (int y = 0; y < N; y++) {
 				while (!grid[x][y].isEmpty()) {
 					final Atom atom = grid[x][y].poll();
-					final int nx = (x + dirs[atom.d][0] * atom.s + N) % N;
-					final int ny = (y + dirs[atom.d][1] * atom.s + N) % N;
+					final int nx = convertPos(x + dirs[atom.d][0] * atom.s);
+					final int ny = convertPos(y + dirs[atom.d][1] * atom.s);
 					temp[nx][ny].add(atom);
 				}
 			}
@@ -113,6 +113,19 @@ public class Main {
 			}
 		}
 		grid = temp;
+	}
+
+	private static int convertPos(int r) {
+		if (r < 0) {
+			r %= N;
+			r += N;
+			if (r == N) {
+				r = 0;
+			}
+		} else if (r >= N) {
+			r %= N;
+		}
+		return r;
 	}
 
 	static class Atom {
