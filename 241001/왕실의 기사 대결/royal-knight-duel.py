@@ -83,9 +83,9 @@ def delete_knight_from_board(pid):
 
 
 L, N, Q = map(int, input().split())
-board = [[2] * (L + 2)] + [[2] + list(map(int, input().split())) + [2] for _ in range(L)] + [[2] * (L + 2)]  # 빈칸, 함정, 벽 정보
+board = [[WALL] * (L + 2)] + [[WALL] + list(map(int, input().split())) + [WALL] for _ in range(L)] + [[WALL] * (L + 2)]  # 빈칸, 함정, 벽 정보
 knight = dict()  # 기사 정보 (r, c, h, w, k)
-knight_board = [[0] * (L + 2) for _ in range(L + 2)]  # 기사 위치 정보 (pid)
+knight_board = [[EMPTY] * (L + 2) for _ in range(L + 2)]  # 기사 위치 정보 (pid)
 for pid in range(1, N + 1):
     r, c, h, w, k = map(int, input().split())
     knight[pid] = (r, c, h, w, k)
