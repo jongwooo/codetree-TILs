@@ -18,9 +18,8 @@ def players_move():
             continue
         x, y = player_pos[pid]
         cur_d = player_d[pid - 1]
-        found_empty_pos = False
-        found_contract_pos = False
         player_d_priority = player_d_priorities[4 * (pid - 1) + cur_d]
+        moved = False
         for d in player_d_priority:
             dx, dy = dirs[d]
             nx = x + dx
@@ -29,9 +28,9 @@ def players_move():
                 temp[nx][ny].append(pid)
                 player_pos[pid] = (nx, ny)
                 player_d[pid - 1] = d
-                found_empty_pos = True
+                moved = True
                 break
-        if found_empty_pos or not alive[pid]:
+        if moved:
             continue
         for d in player_d_priority:
             dx, dy = dirs[d]
@@ -41,20 +40,22 @@ def players_move():
                 temp[nx][ny].append(pid)
                 player_pos[pid] = (nx, ny)
                 player_d[pid - 1] = d
-                found_contract_pos = True
+                moved = True
                 break
-        if not found_empty_pos and not found_contract_pos:
-            temp[x][y].append(pid)
+        if moved:
+            continue
+        temp[x][y].append(pid)
     for i in range(n):
         for j in range(n):
             if not temp[i][j]:
                 continue
             if len(temp[i][j]) == 1:
+                exclusive_contracts[i][j] = (k, temp[i][j][0])
                 grid[i][j] = temp[i][j][0]
                 continue
             min_player = min(temp[i][j])
-            grid[i][j] = min_player
             exclusive_contracts[i][j] = (k, min_player)
+            grid[i][j] = min_player
             for temp_id in temp[i][j]:
                 if temp_id != min_player:
                     delete_player(temp_id)
@@ -75,7 +76,7 @@ def decrease_time():
             time, pid = exclusive_contracts[i][j]
             time -= 1
             if time == 0:
-                exclusive_contracts[i][j] == (0, 0)
+                exclusive_contracts[i][j] = (0, 0)
             else:
                 exclusive_contracts[i][j] = (time, pid)
 
@@ -96,8 +97,8 @@ initialize()
 turn_cnt = 1
 for _ in range(1_000):
     players_move()
-    decrease_time()
     if check_only_1st_player_alive():
         break
+    decrease_time()
     turn_cnt += 1
 print(turn_cnt if turn_cnt < 1_000 else -1)
