@@ -2,9 +2,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -20,7 +18,7 @@ public class Main {
 	static int N, M, P, C, D;
 	static int[][] board;
 	static int rr, rc;
-	static Map<Integer, int[]> santa;
+	static int[][] santa;
 	static int santaCount;
 	static int[] panicTime;
 	static boolean[] gameOver;
@@ -40,7 +38,7 @@ public class Main {
 		rr = Integer.parseInt(st.nextToken());
 		rc = Integer.parseInt(st.nextToken());
 		board[rr][rc] = RUDOLPH;
-		santa = new HashMap<>();
+		santa = new int[P + 1][2];
 		santaCount = P;
 		panicTime = new int[P + 1];
 		gameOver = new boolean[P + 1];
@@ -51,7 +49,8 @@ public class Main {
 			final int sr = Integer.parseInt(st.nextToken());
 			final int sc = Integer.parseInt(st.nextToken());
 			board[sr][sc] = pn;
-			santa.put(pn, new int[] { sr, sc });
+			santa[pn][0] = sr;
+			santa[pn][1] = sc;
 		}
 		for (int t = 1; t <= M; t++) {
 			turn(t);
@@ -103,9 +102,10 @@ public class Main {
 			if (gameOver[pn]) {
 				continue;
 			}
-			final int[] santaPos = santa.get(pn);
-			final int dist = distance(rr, rc, santaPos[0], santaPos[1]);
-			candidates.add(new int[] { dist, santaPos[0], santaPos[1] });
+			final int sr = santa[pn][0];
+			final int sc = santa[pn][1];
+			final int dist = distance(rr, rc, sr, sc);
+			candidates.add(new int[] { dist, sr, sc });
 		}
 		Collections.sort(candidates, (o1, o2) -> {
 			if (o1[0] != o2[0]) {
@@ -148,7 +148,6 @@ public class Main {
 		final int nsr = sr + dr * C;
 		final int nsc = sc + dc * C;
 		if (!inBoard(nsr, nsc)) {
-			santa.remove(pn);
 			gameOver[pn] = true;
 			santaCount--;
 			return;
@@ -157,13 +156,13 @@ public class Main {
 			interaction(nsr, nsc, dr, dc);
 		}
 		board[nsr][nsc] = pn;
-		santa.put(pn, new int[] { nsr, nsc });
+		santa[pn][0] = nsr;
+		santa[pn][1] = nsc;
 	}
 
 	private static void santaMove(final int time, final int pn) {
-		final int[] santaPos = santa.get(pn);
-		final int sr = santaPos[0];
-		final int sc = santaPos[1];
+		final int sr = santa[pn][0];
+		final int sc = santa[pn][1];
 		final int curDist = distance(rr, rc, sr, sc);
 		final List<int[]> candidates = new ArrayList<>();
 		for (int d = 0; d < 4; d++) {
@@ -192,7 +191,8 @@ public class Main {
 			crushSantaToRudolph(time, pn, d);
 		} else {
 			board[nsr][nsc] = pn;
-			santa.put(pn, new int[] { nsr, nsc });
+			santa[pn][0] = nsr;
+			santa[pn][1] = nsc;
 		}
 	}
 
@@ -202,7 +202,6 @@ public class Main {
 		final int nsr = rr - santaDirs[d][0] * D;
 		final int nsc = rc - santaDirs[d][1] * D;
 		if (!inBoard(nsr, nsc)) {
-			santa.remove(pn);
 			gameOver[pn] = true;
 			santaCount--;
 			return;
@@ -211,7 +210,8 @@ public class Main {
 			interaction(nsr, nsc, -santaDirs[d][0], -santaDirs[d][1]);
 		}
 		board[nsr][nsc] = pn;
-		santa.put(pn, new int[] { nsr, nsc });
+		santa[pn][0] = nsr;
+		santa[pn][1] = nsc;
 	}
 
 	private static void interaction(final int r, final int c, final int dr, final int dc) {
@@ -220,7 +220,6 @@ public class Main {
 		final int nsr = r + dr;
 		final int nsc = c + dc;
 		if (!inBoard(nsr, nsc)) {
-			santa.remove(pn);
 			gameOver[pn] = true;
 			santaCount--;
 			return;
@@ -229,6 +228,7 @@ public class Main {
 			interaction(nsr, nsc, dr, dc);
 		}
 		board[nsr][nsc] = pn;
-		santa.put(pn, new int[] { nsr, nsc });
+		santa[pn][0] = nsr;
+		santa[pn][1] = nsc;
 	}
 }
