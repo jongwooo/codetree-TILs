@@ -117,12 +117,12 @@ def crush_santa_to_rudolph(t, pn, d):
     santa[pn] = (nsr, nsc)
 
 
-def interaction(r, c, dr, dc):
+def interaction(sr, sc, dr, dc):
     global board, santa, santa_cnt, alive
-    pn = board[r][c]
-    board[r][c] = EMPTY
-    nsr = r + dr
-    nsc = c + dc
+    pn = board[sr][sc]
+    board[sr][sc] = EMPTY
+    nsr = sr + dr
+    nsc = sc + dc
     if not in_board(nsr, nsc):
         del santa[pn]
         alive[pn] = 0
