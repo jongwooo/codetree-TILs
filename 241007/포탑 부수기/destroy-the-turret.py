@@ -15,7 +15,7 @@ def find_target():
     candidates = []
     for i in range(N):
         for j in range(M):
-            if turrets[i][j] and (i, j) is not (ax, ay):
+            if turrets[i][j] and (i, j) != (ax, ay):
                 candidates.append((i, j, turrets[i][j], attack_history[i][j], i + j, i))
     candidates.sort(key=lambda c: (-c[2], c[3], c[4], c[5]))
     return candidates[0][0], candidates[0][1]
@@ -30,9 +30,9 @@ def laser_attack():
         if (x, y) == (tx, ty):
             return True, laser_path
         for dx, dy in laser_dirs:
-            nx = x + dx
-            ny = y + dy
-            if 0 <= nx < N and 0 <= ny < M and not visited[nx][ny] and turrets[nx][ny]:
+            nx = (x + dx) % N
+            ny = (y + dy) % M
+            if turrets[nx][ny] and not visited[nx][ny]:
                 queue.append((nx, ny, laser_path + [(nx, ny)]))
                 visited[nx][ny] = 1
     return False, []
@@ -40,11 +40,11 @@ def laser_attack():
 
 def cannon_attack():
     global turrets
-    cannon_path = []
+    cannon_path = [(tx, ty)]
     for dx, dy in cannon_dirs:
         nx = (tx + dx) % N
         ny = (ty + dy) % M
-        if turrets[nx][ny]:
+        if turrets[nx][ny] and (nx, ny) != (ax, ay):
             cannon_path.append((nx, ny))
     return cannon_path
 
@@ -61,11 +61,11 @@ def attack(atk_path):
             turrets[x][y] = 0
 
 
-def repair():
+def repair(atk_path):
     global turrets
     for i in range(N):
         for j in range(M):
-            if turrets[i][j] and (i, j) not in ((ax, ay), (tx, ty)):
+            if turrets[i][j] and (i, j) != (ax, ay) and (i, j) not in atk_path:
                 turrets[i][j] += 1
 
 
@@ -92,7 +92,7 @@ N, M, K = map(int, input().split())
 turrets = [list(map(int, input().split())) for _ in range(N)]
 attack_history = [[0] * M for _ in range(N)]
 laser_dirs = ((0, 1), (1, 0), (0, -1), (-1, 0))
-cannon_dirs = ((0, 0), (0, 1), (0, -1), (1, 1), (1, -1), (1, 0), (-1, 1), (-1, -1), (-1, 0))
+cannon_dirs = ((0, 1), (0, -1), (1, 1), (1, -1), (1, 0), (-1, 1), (-1, -1), (-1, 0))
 for turn in range(K):
     ax, ay = find_attacker()
     attack_history[ax][ay] = turn + 1
@@ -102,7 +102,7 @@ for turn in range(K):
     if not success:
         path = cannon_attack()
     attack(path)
-    repair()
+    repair(path)
     if only_one_turret_left():
         break
 print(find_max_atk_turret())
