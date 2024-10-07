@@ -3,20 +3,20 @@ from collections import deque
 
 def find_attacker():
     candidates = []
-    for i in range(N):
-        for j in range(M):
-            if turrets[i][j]:
-                candidates.append((i, j, turrets[i][j], attack_history[i][j], i + j, i))
+    for x in range(N):
+        for y in range(M):
+            if turrets[x][y]:
+                candidates.append((x, y, turrets[x][y], attack_history[x][y], x + y, y))
     candidates.sort(key=lambda c: (c[2], -c[3], -c[4], -c[5]))
     return candidates[0][0], candidates[0][1]
 
 
 def find_target():
     candidates = []
-    for i in range(N):
-        for j in range(M):
-            if turrets[i][j] and (i, j) != (ax, ay):
-                candidates.append((i, j, turrets[i][j], attack_history[i][j], i + j, i))
+    for x in range(N):
+        for y in range(M):
+            if turrets[x][y] and (x, y) != (ax, ay):
+                candidates.append((x, y, turrets[x][y], attack_history[x][y], x + y, y))
     candidates.sort(key=lambda c: (-c[2], c[3], c[4], c[5]))
     return candidates[0][0], candidates[0][1]
 
@@ -102,7 +102,7 @@ for turn in range(K):
     if not success:
         path = cannon_attack()
     attack(path)
-    repair(path)
     if only_one_turret_left():
         break
+    repair(path)
 print(find_max_atk_turret())
