@@ -19,8 +19,7 @@ def turn():
             player_d[pid] = (d + 2) % 4
         if (nx, ny) not in player_pos:
             player_pos[pid] = (nx, ny)
-            if guns[nx][ny]:
-                pick_up_strongest_gun(pid, nx, ny)
+            pick_up_strongest_gun(pid, nx, ny)
         else:
             pid2 = player_pos.index((nx, ny))
             player_pos[pid] = (nx, ny)
@@ -41,14 +40,15 @@ def turn():
                 if in_range(lx, ly) and (lx, ly) not in player_pos:
                     player_pos[lose_player] = (lx, ly)
                     player_d[lose_player] = d
-                    if guns[lx][ly]:
-                        pick_up_strongest_gun(lose_player, lx, ly)
+                    pick_up_strongest_gun(lose_player, lx, ly)
                     break
                 d = (d + 1) % 4
             pick_up_strongest_gun(win_player, nx, ny)
 
 
 def pick_up_strongest_gun(pid, x, y):
+    if not guns[x][y]:
+        return
     if player_guns[pid]:
         guns[x][y].append(player_guns[pid])
     strongest_gun = max(guns[x][y])
