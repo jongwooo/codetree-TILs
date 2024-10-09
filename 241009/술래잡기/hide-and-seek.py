@@ -6,36 +6,57 @@ def in_range(x, y):
     return 0 <= x < n and 0 <= y < n
 
 
-def define_seeker_path():
-    global seeker_path
-    in_to_out_path = []
+def distance_from_seeker(x, y):
+    return abs(sx - x) + abs(sy - y)
+
+
+def initialize_in_to_out():
+    global in_to_out
     x, y = n // 2, n // 2
-    d = 0
-    move = 0
     dist = 1
-    flag = False
+    move = 0
+    d = 0
     while True:
         for _ in range(dist):
-            in_to_out_path.append((x, y, d))
             dx, dy = dirs[d]
-            nx = x + dx
-            ny = y + dy
-            if (nx, ny) == (-1, 0):
-                flag = True
-                break
-            x, y = nx, ny
-        if flag:
-            break
+            x = x + dx
+            y = y + dy
+            in_to_out[x][y] = d
+            if (x, y) == (-1, 0):
+                return
         d = (d + 1) % 4
+        in_to_out[x][y] = d
         move += 1
         if move == 2:
-            move = 0
             dist += 1
-    seeker_path = in_to_out_path + in_to_out_path[::-1][1:len(in_to_out_path) - 1]
+            move = 0
 
 
-def distance(x1, y1, x2, y2):
-    return abs(x1 - x2) + abs(y1 - y2)
+def initialize_out_to_in():
+    global out_to_in
+    x, y = 0, 0
+    d = 0
+    for i in range(n ** 2):
+        if d == 0 or d == 2:
+            out_to_in[x][y] = 2 - d
+        else:
+            out_to_in[x][y] = d
+        if d == 0:
+            x += 1
+            if x == n - 1 or out_to_in[x + 1][y] != -1:
+                d = 1
+        elif d == 1:
+            y += 1
+            if y == n - 1 or out_to_in[x][y + 1] != -1:
+                d = 2
+        elif d == 2:
+            x -= 1
+            if x == 0 or out_to_in[x - 1][y] != -1:
+                d = 3
+        elif d == 3:
+            y -= 1
+            if y == n - 1 or out_to_in[x][y - 1] != -1:
+                d = 0
 
 
 def runaways_move():
@@ -44,8 +65,7 @@ def runaways_move():
         if tagged[pid]:
             continue
         rx, ry = runaway_pos[pid]
-        sx, sy, _ = seeker_path[seeker_pos_idx]
-        if distance(rx, ry, sx, sy) > 3:
+        if distance_from_seeker(rx, ry) > 3:
             continue
         rd = runaway_d[pid]
         dx, dy = dirs[rd]
@@ -60,9 +80,27 @@ def runaways_move():
         runaway_pos[pid] = (nx, ny)
 
 
+def seeker_move():
+    global sx, sy, in_out
+    if in_out:
+        sd = in_to_out[sx][sy]
+    else:
+        sd = out_to_in[sx][sy]
+    dx, dy = dirs[sd]
+    sx += dx
+    sy += dy
+    if (sx, sy) == (0, 0):
+        in_out = False
+    elif (sx, sy) == (n // 2, n // 2):
+        in_out = True
+
+
 def find_and_tag_runaways():
     global tagged
-    sx, sy, sd = seeker_path[seeker_pos_idx]
+    if in_out:
+        sd = in_to_out[sx][sy]
+    else:
+        sd = out_to_in[sx][sy]
     dx, dy = dirs[sd]
     tagged_cnt = 0
     for d in range(3):
@@ -83,9 +121,12 @@ def find_and_tag_runaways():
 
 dirs = ((-1, 0), (0, 1), (1, 0), (0, -1))
 n, m, h, k = map(int, input().split())
-seeker_path = []
-define_seeker_path()
-seeker_pos_idx = 0
+in_to_out = [[0] * n for _ in range(n)]
+out_to_in = [[-1] * n for _ in range(n)]
+initialize_in_to_out()
+initialize_out_to_in()
+in_out = True
+sx, sy = n // 2, n // 2
 runaway_pos = []
 runaway_d = [0] * m
 tagged = [0] * m
@@ -97,7 +138,7 @@ tree_pos = [tuple(map(int_minus_one(), input().split())) for _ in range(h)]
 score = 0
 for turn in range(1, k + 1):
     runaways_move()
-    seeker_pos_idx += (seeker_pos_idx + 1) % len(seeker_path)
+    seeker_move()
     tagged_cnt = find_and_tag_runaways()
     score += turn * tagged_cnt
 print(score)
