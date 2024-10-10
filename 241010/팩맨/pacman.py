@@ -39,27 +39,31 @@ def monsters_move():
 def pacman_move():
     global monsters, eaten, max_eat, corpses
     max_eat = -1
-    dfs(pr, pc, [], 0)
+    dfs(pr, pc, 0, 0, [])
     for r, c in eaten:
         if monsters[r][c]:
             monsters[r][c].clear()
             corpses[r][c] = 3
 
 
-def dfs(r, c, visited, eat_cnt):
+def dfs(r, c, depth, eat_cnt, visited):
     global pr, pc, eaten, max_eat
-    if len(visited) == 3:
+    if depth == 3:
         if max_eat < eat_cnt:
             max_eat = eat_cnt
             pr, pc = r, c
             eaten = visited[:]
+        return 
     for dr, dc in pacman_dirs:
         nr = r + dr
         nc = c + dc
-        if in_range(nr, nc) and (nr, nc) not in visited:
-            visited.append((nr, nc))
-            dfs(nr, nc, visited, eat_cnt + len(monsters[nr][nc]))
-            visited.pop()
+        if in_range(nr, nc):
+            if (nr, nc) not in visited:
+                visited.append((nr, nc))
+                dfs(nr, nc, depth + 1, eat_cnt + len(monsters[nr][nc]), visited)
+                visited.pop()
+            else:
+                dfs(nr, nc, depth + 1, eat_cnt, visited)
 
 
 def destroy_monster_corpses():
