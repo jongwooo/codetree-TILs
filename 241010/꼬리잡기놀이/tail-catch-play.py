@@ -35,7 +35,7 @@ def bfs(hx, hy, visited, team_id):
             nx = x + dx
             ny = y + dy
             if in_range(nx, ny) and not visited[nx][ny]:
-                if grid[nx][ny] == BODY or grid[nx][ny] == TAIL:
+                if grid[nx][ny] == BODY or ((hx, hy) != (x, y) and grid[nx][ny] == TAIL):
                     queue.append((nx, ny))
                     team.append((nx, ny))
                     visited[nx][ny] = 1
