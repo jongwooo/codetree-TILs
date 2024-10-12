@@ -23,9 +23,10 @@ def knights_move(pid, d):
         for next_pid in interaction_set:
             if reach_the_wall(next_pid, d): # 기사가 이동하려는 방향의 끝에 벽이 있다면 모든 기사는 이동할 수 없게 된다.
                 return
-            if next_pid not in stack:
-                stack.append(next_pid)
-                affected_knights.append(next_pid)
+            if next_pid in stack:
+                stack.remove(next_pid)
+            stack.append(next_pid)
+            affected_knights.append(next_pid)
             next_interaction_set.update(interaction(next_pid, d))
         interaction_set = next_interaction_set
     while stack:
