@@ -9,7 +9,7 @@ def reach_the_wall(pid, d):
     for i in range(h):
         for j in range(w):
             if board[r + i + dr][c + j + dc] == WALL:
-                return TRAP
+                return True
     return False
 
 
@@ -52,8 +52,10 @@ def interaction(pid, d):
     interaction_set = set()
     for i in range(h):
         for j in range(w):
-            if knights_board[r + i + dr][c + j + dc] != pid and knights_board[r + i + dr][c + j + dc] != EMPTY:
-                interaction_set.add(knights_board[r + i + dr][c + j + dc])
+            nr = r + i + dr
+            nc = c + j + dc
+            if knights_board[nr][nc] != pid and knights_board[nr][nc] != EMPTY:
+                interaction_set.add(knights_board[nr][nc])
     return interaction_set
 
 
@@ -96,6 +98,8 @@ for pid in range(1, N + 1):
 for _ in range(Q):
     pid, d = map(int, input().split())
     if not knights_stamina[pid]:
+        continue
+    if reach_the_wall(pid, d):
         continue
     knights_move(pid, d)
 print(sum(damages))
