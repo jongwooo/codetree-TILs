@@ -20,7 +20,7 @@ def knights_move(pid, d):
     while interaction_set:
         next_interaction_set = set()
         for next_pid in interaction_set:
-            if reach_the_wall(next_pid, d): # 기사가 이동하려는 방향의 끝에 벽이 있다면 모든 기사는 이동할 수 없게 된다.
+            if reach_the_wall(next_pid, d):  # 기사가 이동하려는 방향의 끝에 벽이 있다면 모든 기사는 이동할 수 없게 된다.
                 return
             if next_pid in stack:
                 stack.remove(next_pid)
@@ -31,7 +31,7 @@ def knights_move(pid, d):
         p = stack.pop()
         knight_move(p, d)
         if p != pid:
-            check_trap(p)    
+            check_trap(p)
 
 
 def knight_move(pid, d):
@@ -44,7 +44,7 @@ def knight_move(pid, d):
     for i in range(h):
         for j in range(w):
             knight_board[r + i + dr][c + j + dc] = pid
-    knight[pid] = (r + dr, c + dc, h, w, k) # 위치 정보 업데이트
+    knight[pid] = (r + dr, c + dc, h, w, k)  # 위치 정보 업데이트
 
 
 def interaction(pid, d):
@@ -85,7 +85,8 @@ def delete_knight_from_board(pid):
 
 
 L, N, Q = map(int, input().split())
-board = [[WALL] * (L + 2)] + [[WALL] + list(map(int, input().split())) + [WALL] for _ in range(L)] + [[WALL] * (L + 2)]  # 빈칸, 함정, 벽 정보
+board = [[WALL] * (L + 2)] + [[WALL] + list(map(int, input().split())) + [WALL] for _ in range(L)] + [
+    [WALL] * (L + 2)]  # 빈칸, 함정, 벽 정보
 knight = dict()  # 기사 정보 (r, c, h, w, k)
 knight_board = [[EMPTY] * (L + 2) for _ in range(L + 2)]  # 기사 위치 정보 (pid)
 for pid in range(1, N + 1):
