@@ -4,8 +4,8 @@ WALL = 2
 
 
 def reach_the_wall(pid, d):
-    global knight, board
-    r, c, h, w, k = knight[pid]
+    global knights, board
+    r, c, h, w, _ = knights[pid]
     dr, dc = dirs[d]
     for i in range(h):
         for j in range(w):
@@ -31,37 +31,37 @@ def knights_move(pid, d):
         p = stack.pop()
         knight_move(p, d)
         if p != pid:
-            check_trap(p)    
+            check_trap(p)
 
 
 def knight_move(pid, d):
-    global knight, knight_board
-    r, c, h, w, k = knight[pid]
+    global knights, knights_board
+    r, c, h, w, _ = knights[pid]
     dr, dc = dirs[d]
     for i in range(h):
         for j in range(w):
-            knight_board[r + i][c + j] = EMPTY
+            knights_board[r + i][c + j] = EMPTY
     for i in range(h):
         for j in range(w):
-            knight_board[r + i + dr][c + j + dc] = pid
-    knight[pid] = (r + dr, c + dc, h, w, k) # 위치 정보 업데이트
+            knights_board[r + i + dr][c + j + dc] = pid
+    knights[pid] = (r + dr, c + dc, h, w, k) # 위치 정보 업데이트
 
 
 def interaction(pid, d):
-    global knight, knight_board
-    r, c, h, w, k = knight[pid]
+    global knights, knights_board
+    r, c, h, w, _ = knights[pid]
     dr, dc = dirs[d]
     interaction_set = set()
     for i in range(h):
         for j in range(w):
-            if knight_board[r + i + dr][c + j + dc] != pid and knight_board[r + i + dr][c + j + dc] != EMPTY:
-                interaction_set.add(knight_board[r + i + dr][c + j + dc])
+            if knights_board[r + i + dr][c + j + dc] != pid and knights_board[r + i + dr][c + j + dc] != EMPTY:
+                interaction_set.add(knights_board[r + i + dr][c + j + dc])
     return interaction_set
 
 
 def check_trap(pid):
-    global knight, board, damages
-    r, c, h, w, k = knight[pid]
+    global knights, board, damages
+    r, c, h, w, k = knights[pid]
     for i in range(h):
         for j in range(w):
             if board[r + i][c + j] == TRAP:
@@ -70,30 +70,30 @@ def check_trap(pid):
             if k == 0:
                 delete_knight_from_board(pid)
                 return
-    knight[pid] = (r, c, h, w, k)
+    knights[pid] = (r, c, h, w, k)
 
 
 def delete_knight_from_board(pid):
-    global knight, knight_board
-    r, c, h, w, k = knight[pid]
+    global knights, knights_board
+    r, c, h, w, _ = knights[pid]
     game_over[pid] = True
     damages[pid] = 0
-    del knight[pid]
+    del knights[pid]
     for i in range(h):
         for j in range(w):
-            knight_board[r + i][c + j] = EMPTY
+            knights_board[r + i][c + j] = EMPTY
 
 
 L, N, Q = map(int, input().split())
 board = [[WALL] * (L + 2)] + [[WALL] + list(map(int, input().split())) + [WALL] for _ in range(L)] + [[WALL] * (L + 2)]  # 빈칸, 함정, 벽 정보
-knight = dict()  # 기사 정보 (r, c, h, w, k)
-knight_board = [[EMPTY] * (L + 2) for _ in range(L + 2)]  # 기사 위치 정보 (pid)
+knights = dict()  # 기사 정보 (r, c, h, w, k)
+knights_board = [[EMPTY] * (L + 2) for _ in range(L + 2)]  # 기사 위치 정보 (pid)
 for pid in range(1, N + 1):
     r, c, h, w, k = map(int, input().split())
-    knight[pid] = (r, c, h, w, k)
+    knights[pid] = (r, c, h, w, k)
     for i in range(h):
         for j in range(w):
-            knight_board[r + i][c + j] = pid
+            knights_board[r + i][c + j] = pid
 dirs = ((-1, 0), (0, 1), (1, 0), (0, -1))  # 위쪽, 오른쪽, 아래쪽, 왼쪽
 game_over = [False] * (N + 1)
 damages = [0] * (N + 1)
