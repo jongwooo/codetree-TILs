@@ -16,7 +16,6 @@ def reach_the_wall(pid, d):
 
 def knights_move(pid, d):
     stack = [pid]
-    affected_knights = []
     interaction_set = interaction(pid, d)
     while interaction_set:
         next_interaction_set = set()
@@ -26,15 +25,13 @@ def knights_move(pid, d):
             if next_pid in stack:
                 stack.remove(next_pid)
             stack.append(next_pid)
-            affected_knights.append(next_pid)
             next_interaction_set.update(interaction(next_pid, d))
         interaction_set = next_interaction_set
     while stack:
         p = stack.pop()
         knight_move(p, d)
-    while affected_knights:
-        p = affected_knights.pop()
-        check_trap(p)
+        if p != pid:
+            check_trap(p)    
 
 
 def knight_move(pid, d):
