@@ -4,7 +4,7 @@ WALL = 2
 
 
 def reach_the_wall(pid, d):
-    r, c, h, w = knights[pid]
+    r, c, h, w, _ = knights[pid]
     dr, dc = knights_dirs[d]
     for i in range(h):
         for j in range(w):
@@ -21,7 +21,8 @@ def knights_move(pid, d):
         for next_pid in interaction_set:
             if reach_the_wall(next_pid, d):
                 return
-            stack.append(next_pid)
+            if next_pid not in stack:
+                stack.append(next_pid)
             next_interaction_set.update(interaction(next_pid, d))
         interaction_set = next_interaction_set
     while stack:
@@ -31,10 +32,9 @@ def knights_move(pid, d):
             check_trap(p)
 
 
-
 def knight_move(pid, d):
     global knights, knights_board
-    r, c, h, w = knights[pid]
+    r, c, h, w, k = knights[pid]
     dr, dc = knights_dirs[d]
     for i in range(h):
         for j in range(w):
@@ -42,12 +42,12 @@ def knight_move(pid, d):
     for i in range(h):
         for j in range(w):
             knights_board[r + i + dr][c + j + dc] = pid
-    knights[pid] = (r + dr, c + dc, h, w)
+    knights[pid] = (r + dr, c + dc, h, w, k)
 
 
 def interaction(pid, d):
     global knights, knights_board
-    r, c, h, w = knights[pid]
+    r, c, h, w, _ = knights[pid]
     dr, dc = knights_dirs[d]
     interaction_set = set()
     for i in range(h):
@@ -60,25 +60,28 @@ def interaction(pid, d):
 
 
 def check_trap(pid):
-    global knights_stamina, damages
-    r, c, h, w = knights[pid]
+    global game_over, damages
+    r, c, h, w, k = knights[pid]
     for i in range(h):
         for j in range(w):
             if board[r + i][c + j] == TRAP:
-                knights_stamina[pid] -= 1
                 damages[pid] += 1
-            if not knights_stamina[pid]:
+                k -= 1
+            if k == 0:
                 delete_knight_from_board(pid)
                 return
+    knights[pid] = (r, c, h, w, k)
 
 
 def delete_knight_from_board(pid):
     global knights_board, damages
-    r, c, h, w = knights[pid]
+    r, c, h, w, _ = knights[pid]
+    game_over[pid] = True
+    damages[pid] = 0
+    del knights[pid]
     for i in range(h):
         for j in range(w):
             knights_board[r + i][c + j] = EMPTY
-    damages[pid] = 0
 
 
 knights_dirs = ((-1, 0), (0, 1), (1, 0), (0, -1))  # 위쪽, 오른쪽, 아래쪽, 왼쪽
@@ -86,18 +89,17 @@ L, N, Q = map(int, input().split())
 board = [[WALL] * (L + 2)] + [[WALL] + list(map(int, input().split())) + [WALL] for _ in range(L)] + [[WALL] * (L + 2)]
 knights = dict()
 knights_board = [[EMPTY] * (L + 2) for _ in range(L + 2)]
-knights_stamina = [0] * (N + 1)
+game_over = [False] * (N + 1)
 damages = [0] * (N + 1)
 for pid in range(1, N + 1):
     r, c, h, w, k = map(int, input().split())
-    knights[pid] = (r, c, h, w)
-    knights_stamina[pid] = k
+    knights[pid] = (r, c, h, w, k)
     for i in range(h):
         for j in range(w):
             knights_board[r + i][c + j] = pid
 for _ in range(Q):
     pid, d = map(int, input().split())
-    if not knights_stamina[pid]:
+    if game_over[pid]:
         continue
     if reach_the_wall(pid, d):
         continue
